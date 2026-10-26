@@ -41,7 +41,7 @@ plan are in [docs/server.md](https://github.com/ludovic111/horizon/blob/main/doc
 
 ## 1. Install
 
-Linux (x86-64) and macOS (Apple Silicon):
+Linux (x86-64 or arm64) and macOS (Apple Silicon):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/ludovic111/horizon/main/packaging/server/install.sh | sh
@@ -62,7 +62,7 @@ GitHub publishes, and never asks for sudo or administrator rights. It installs:
 - a `game-files` folder for the files you prepare, kept across updates.
 
 Options: `--version vX.Y.Z`, `--dir FOLDER`, `--bin FOLDER` (Windows: `-Version`, `-Dir`). Other systems,
-such as Linux on ARM, build from source: `cargo build --release -p horizon-client --bin horizon-client -p
+such as ARM Windows, build from source: `cargo build --release -p horizon-client --bin horizon-client -p
 horizon-server` and keep both programs in one folder.
 
 The Horizon launcher also installs releases. Every release folder holds `horizon-server`, so you can run it

@@ -113,6 +113,7 @@ export function recentHtml(list, { rows = 5, picks = 3 } = {}) {
 
 const ASSET_LABELS = [
   [/linux-x86_64/, "Linux x86-64"],
+  [/linux-arm64/, "Linux arm64"],
   [/macos-arm64/, "macOS, Apple Silicon"],
   [/macos-x86_64/, "macOS, Intel"],
   [/windows-x64/, "Windows x64"],

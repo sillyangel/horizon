@@ -151,6 +151,7 @@ flowchart LR
     decide -- otherwise --> wait(["wait"])
     subgraph build["build, in parallel"]
         linux["Linux x86_64<br/>GitHub ubuntu-22.04"]
+        linuxarm["Linux arm64<br/>GitHub ubuntu-22.04-arm"]
         windows["Windows x64<br/>GitHub windows-latest"]
         mac["macOS arm64<br/>Mac mini runner<br/>+ offscreen game run"]
     end
@@ -211,6 +212,7 @@ the notes.
 | Archive | Runs on | Checks |
 | --- | --- | --- |
 | `horizon-linux-x86_64.tar.gz` | GitHub `ubuntu-22.04` (an older glibc, so it runs on any recent distribution) | the standard loader and libraries only (`tools/check_imports.py`) |
+| `horizon-linux-arm64.tar.gz` | GitHub `ubuntu-22.04-arm`, the same Ubuntu on an arm64 runner (Chromebooks' Linux terminal and other arm64 machines) | the standard loader and libraries only (`tools/check_imports.py`) |
 | `horizon-server-linux-x86_64.tar.gz` | the same Linux job, after the client archive: `horizon-server`, `horizon-prepare` and the game built with `--no-default-features` as `horizon-engine` (docs/server.md) | as above, and neither `libasound.so.2` nor `libudev.so.1` (`tools/check_imports.py --server`) |
 | `horizon-windows-x64.zip` | GitHub `windows-latest`, C runtime linked in | system DLLs only (`tools/check_imports.py`) |
 | `horizon-macos-arm64.zip` | The Mac mini's runner (`vars.MAC_RUNNER=macos-latest` sends it to GitHub) | system libraries only (`otool -L`); a 1500-frame offscreen run of a new world (about 12 s; 300 frames end before the world has loaded) with resources prepared from the runner's own Minecraft (`--offscreen --world smoke --frames 1500 --smoke-report`: frames drawn, chunks generated and meshed, a player, no error) |
@@ -361,8 +363,9 @@ and by hand; pushes to `launcher` and `launcher-*` branches only build.
   `HORIZON_LAUNCHER_TAG`, which `launcher/src/backend.rs` reads with `option_env!` (falling back to `Cargo.toml`'s),
   so `--version`, the window, the User-Agent and the self-update comparison all use them. Each build checks
   `--version` says it.
-- Linux on GitHub `ubuntu-22.04`, Windows on `windows-latest`, macOS on the Mac mini's runner; each runs the
-  launcher's tests, checks its libraries, and installs the latest game release with the new launcher.
+- Linux on GitHub `ubuntu-22.04` (x86-64) and `ubuntu-22.04-arm` (arm64), Windows on `windows-latest`, macOS on
+  the Mac mini's runner; each runs the launcher's tests, checks its libraries, and installs the latest game
+  release with the new launcher.
 - Published with `--latest=false`: the repository's latest release stays a game release. Notes list the pull
   requests under New and Fixed; Kira posts launcher releases without pinging.
 
