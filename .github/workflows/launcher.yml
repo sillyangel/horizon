@@ -1,5 +1,6 @@
 name: launcher
-# Builds the launcher on Linux, macOS and Windows, and releases it by itself (docs/release-flow.md): after a
+# Builds the launcher on Linux (x86-64 and arm64: Chromebooks' Linux terminal and other arm64 machines), macOS
+# and Windows, and releases it by itself (docs/release-flow.md): after a
 # push to main that changes the launcher or a crate it builds in (the paths below),
 # every 10 minutes (a release waiting for merges to settle goes out) and by hand, tools/release_train.py decides as
 # for the game.
@@ -101,6 +102,11 @@ jobs:
             os: ubuntu-22.04
             asset: horizon-launcher-linux-x86_64.tar.gz
             binary: horizon-launcher
+          # ARM Linux: Chromebooks' Linux terminal, and other arm64 machines.
+          - name: linux-arm64
+            os: ubuntu-22.04-arm
+            asset: horizon-launcher-linux-arm64.tar.gz
+            binary: horizon-launcher
           - name: macos
             mac: true
             asset: horizon-launcher-macos-arm64.zip
@@ -189,6 +195,14 @@ jobs:
           # GitHub's API rate-limits shared runner addresses now and then: try a few times.
           retry() { for i in 1 2 3 4; do "$@" && return 0; sleep $((i * 15)); done; return 1; }
           retry "$launcher" versions
+          # A new platform's launcher can come out before any release has its game build (ARM Linux): then
+          # there is nothing to install yet.
+          stable_build='import json, sys; sys.exit(not any(r["available_here"] and not r["prerelease"] for r in json.load(sys.stdin)))'
+          if ! retry "$launcher" --json versions | python3 -c "$stable_build"; then
+            echo "::warning::No stable game release has a build for ${{ matrix.name }} yet: install not tested"
+            rm -rf "$HORIZON_LAUNCHER_HOME"
+            exit 0
+          fi
           retry "$launcher" install latest
           "$launcher" versions --installed
           "$launcher" links --json

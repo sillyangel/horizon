@@ -158,14 +158,15 @@ game built in `Game::new`, the integrated server on its own thread. On that base
 ## 3. Packaging
 
 **Binaries.** The release archives hold `horizon-client`, `horizon-ctl`, `horizon-prepare` and
-`horizon-server`. On Linux the release also has `horizon-server-linux-x86_64.tar.gz`: `horizon-server`,
+`horizon-server`. On x86-64 Linux the release also has `horizon-server-linux-x86_64.tar.gz`: `horizon-server`,
 `horizon-prepare` and `horizon-engine`, the game built with `--no-default-features` (no sound, no
 controllers), which links neither `libasound.so.2` nor `libudev.so.1`. `release.yml` builds it after the
 client archive (`xtask package-server`) and fails if `tools/check_imports.py --server` finds either library;
 CI lints the same build. `horizon-server` runs `horizon-engine` when it is beside it or on the PATH, else
 `horizon-client`. Build it yourself with `cargo build --release -p horizon-client --no-default-features`
-and copy `target/release/horizon-client` as `horizon-engine`. macOS and Windows have no such libraries to
-avoid, so they keep the one archive.
+and copy `target/release/horizon-client` as `horizon-engine`. ARM Linux (`horizon-linux-arm64.tar.gz`)
+ships only the full game, so its engine needs ALSA and udev like a desktop. macOS and Windows have no
+such libraries to avoid, so they keep the one archive.
 
 **Game files: the owner's own copy, as with `prepare`.** Nothing of Mojang's is redistributed and nothing is
 downloaded on the owner's behalf. `horizon-server` looks for prepared resources in this order:
@@ -192,9 +193,9 @@ comes out of the headless-engine work.
 
 - Linux and macOS:
   `curl -fsSL https://raw.githubusercontent.com/ludovic111/horizon/main/packaging/server/install.sh | sh`
-  The script picks the release archive for the OS and architecture (on Linux x86_64 the server archive,
-  on macOS arm64 the game's), downloads it from GitHub Releases, and checks it against the SHA-256 GitHub
-  publishes for each asset. It never asks for sudo. Options: `--version vX.Y.Z`, `--dir` (default
+  The script picks the release archive for the OS and architecture (on x86-64 Linux the server archive,
+  on arm64 Linux and macOS arm64 the game's), downloads it from GitHub Releases, and checks it against the
+  SHA-256 GitHub publishes for each asset. It never asks for sudo. Options: `--version vX.Y.Z`, `--dir` (default
   `~/.local/share/horizon`), `--bin` (default `~/.local/bin`), and `--archive FILE` to install an archive
   already on the machine (a build of your own; no download and no checksum).
   A Linux release from before the server archive installs the full game, which links ALSA's and udev's

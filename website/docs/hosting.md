@@ -86,7 +86,7 @@ This works today, on a VPS or any computer. Everything below is the same program
 
 ### 1. Install
 
-On Linux (x86-64) and macOS (Apple Silicon):
+On Linux (x86-64 or arm64) and macOS (Apple Silicon):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/ludovic111/horizon/main/packaging/server/install.sh | sh
@@ -98,7 +98,7 @@ On Windows (x64), in PowerShell:
 irm https://raw.githubusercontent.com/ludovic111/horizon/main/packaging/server/install.ps1 | iex
 ```
 
-The script downloads the latest release from GitHub, checks it against the SHA-256 GitHub publishes, and never asks for sudo or administrator rights. It puts `horizon-server` and `horizon-prepare` in `~/.local/bin` (on Windows, in your PATH). Other systems, such as Linux on ARM, build from source.
+The script downloads the latest release from GitHub, checks it against the SHA-256 GitHub publishes, and never asks for sudo or administrator rights. It puts `horizon-server` and `horizon-prepare` in `~/.local/bin` (on Windows, in your PATH). Other systems, such as ARM Windows, build from source.
 
 ### 2. Prepare the game files
 

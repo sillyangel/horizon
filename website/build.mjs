@@ -347,7 +347,7 @@ const values = {
   CPU_OPTIONS: options(CPUS, "AMD Ryzen 5 5600X"),
   SPEC_TABLE: specTable,
   BENCH_DATA: JSON.stringify(benchSummary).replace(/</g, "\\u003c"),
-  LAUNCHER_META: `${launcher ? `Launcher ${escape(launcherVersion(launcher.tag_name))} for` : "For"} Linux x86-64, macOS on Apple Silicon and Windows x64.`,
+  LAUNCHER_META: `${launcher ? `Launcher ${escape(launcherVersion(launcher.tag_name))} for` : "For"} Linux x86-64 and arm64, macOS on Apple Silicon and Windows x64.`,
   DISCORD: escape(links.discord || DEFAULT_LINKS.discord),
   SPONSOR: escape(links.sponsor || DEFAULT_LINKS.sponsor),
   CONTRIBUTORS: contributorsHtml(contributors),

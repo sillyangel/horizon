@@ -1,7 +1,8 @@
 #!/bin/sh
 # Installs horizon-server (docs/server.md) on Linux or macOS: the latest Horizon release for this computer,
-# downloaded from GitHub Releases and checked against the SHA-256 GitHub publishes for it. On Linux that is
-# the server build (horizon-server-linux-x86_64.tar.gz), which needs neither ALSA nor udev.
+# downloaded from GitHub Releases and checked against the SHA-256 GitHub publishes for it. On x86-64 Linux
+# that is the server build (horizon-server-linux-x86_64.tar.gz), which needs neither ALSA nor udev; on ARM
+# Linux (Chromebooks' Linux terminal and other arm64 machines) the full game, which holds horizon-server too.
 #
 #   curl -fsSL https://raw.githubusercontent.com/ludovic111/horizon/main/packaging/server/install.sh | sh
 #   curl -fsSL .../install.sh | sh -s -- --version v0.5.0 --dir /opt/horizon --bin /usr/local/bin
@@ -35,6 +36,8 @@ done
 # The archives to look for, in order: on Linux the server build, else (releases before it) the full game.
 case "$(uname -s)-$(uname -m)" in
   Linux-x86_64) ASSETS="horizon-server-linux-x86_64.tar.gz horizon-linux-x86_64.tar.gz" ;;
+  # ARM Linux: the full game, which holds horizon-server too.
+  Linux-aarch64) ASSETS="horizon-linux-arm64.tar.gz" ;;
   Darwin-arm64) ASSETS=horizon-macos-arm64.zip ;;
   *) die "no Horizon release for $(uname -s) $(uname -m) yet: build it from source (docs/server.md)" ;;
 esac

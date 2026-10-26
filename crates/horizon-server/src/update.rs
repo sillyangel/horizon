@@ -15,12 +15,14 @@ use std::{
 
 const REPO: &str = "ludovic111/horizon";
 /// The release archives for this computer, most specific first: on Linux the server build (no ALSA or
-/// udev), else the full game (releases before the server build).
+/// udev), else the full game (releases before the server build). ARM Linux has only the full game.
 const ASSETS: &[&str] = if cfg!(all(target_os = "linux", target_arch = "x86_64")) {
     &[
         "horizon-server-linux-x86_64.tar.gz",
         "horizon-linux-x86_64.tar.gz",
     ]
+} else if cfg!(all(target_os = "linux", target_arch = "aarch64")) {
+    &["horizon-linux-arm64.tar.gz"]
 } else if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
     &["horizon-macos-arm64.zip"]
 } else if cfg!(all(target_os = "windows", target_arch = "x86_64")) {
@@ -888,8 +890,11 @@ mod tests {
     #[test]
     fn a_release_from_before_signing_is_picked_with_its_pinned_digest() {
         if let Some(first) = ASSETS.first() {
-            let pinned = horizon_release_sign::legacy_digest("v2026.10.19", first)
-                .expect("v2026.10.19 is from before signing and has every platform's archive");
+            // Platforms that had no build then (ARM Linux) start at a signed release, so they have no
+            // pinned digest to check here.
+            let Some(pinned) = horizon_release_sign::legacy_digest("v2026.10.19", first) else {
+                return;
+            };
             let old = json!({ "tag_name": "v2026.10.19", "assets": [{ "name": first, "browser_download_url": "u" }] });
             let nothing = |_: &str| -> Result<Vec<u8>, String> { Err("404".into()) };
             assert_eq!(pick(&old, nothing, &[]).unwrap().sha256, pinned);

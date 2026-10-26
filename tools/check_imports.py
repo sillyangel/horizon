@@ -27,9 +27,11 @@ WINDOWS_SYSTEM = {
     "uxtheme.dll", "version.dll", "winmm.dll", "ws2_32.dll", "xinput1_4.dll",
 }
 LINUX_LOADER = "/lib64/ld-linux-x86-64.so.2"
+# Each ELF machine type's own glibc loader (e_machine: x86-64 and AArch64).
+LINUX_LOADERS = {0x3E: LINUX_LOADER, 0xB7: "/lib/ld-linux-aarch64.so.1"}
 LINUX_SYSTEM = {
     "libc.so.6", "libm.so.6", "libgcc_s.so.1", "libdl.so.2", "libpthread.so.0", "librt.so.1",
-    "ld-linux-x86-64.so.2", "libasound.so.2", "libudev.so.1",
+    "ld-linux-x86-64.so.2", "ld-linux-aarch64.so.1", "libasound.so.2", "libudev.so.1",
 }
 # The game's sound (cpal) and controllers (gilrs): a desktop has them, a server image may not.
 LINUX_DESKTOP_ONLY = {"libasound.so.2", "libudev.so.1"}
@@ -123,8 +125,12 @@ def check(path, server=False):
         summary = ", ".join(sorted(set(n.lower() for n in names)))
     else:
         interpreter, needed, runpath = elf_needs(data)
-        if interpreter not in (None, LINUX_LOADER):
-            problems.append(f"loader is {interpreter}, not {LINUX_LOADER}")
+        machine = struct.unpack_from("<H", data, 18)[0]
+        loader = LINUX_LOADERS.get(machine)
+        if loader is None:
+            problems.append(f"is built for ELF machine {machine:#x}, which no release ships")
+        elif interpreter not in (None, loader):
+            problems.append(f"loader is {interpreter}, not {loader}")
         problems += [f"needs {n}, which not every distribution has" for n in needed if n not in LINUX_SYSTEM]
         if server:
             problems += [f"needs {n}, which a server may not have" for n in needed if n in LINUX_DESKTOP_ONLY]

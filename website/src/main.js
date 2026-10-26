@@ -61,12 +61,24 @@ function platform() {
   if (/iPhone|iPad|iPod|Android/i.test(ua) || (navigator.maxTouchPoints > 1 && /Mac/.test(hint))) return null;
   if (/Win/i.test(hint) || /Windows/.test(ua)) return { key: "windows-x64", label: "Windows x64" };
   if (/Mac/i.test(hint) || /Mac OS X/.test(ua)) return { key: "macos-arm64", label: "macOS on Apple Silicon" };
-  if (/Linux|X11/i.test(hint) || /Linux/.test(ua)) return { key: "linux-x86_64", label: "Linux x86-64" };
+  // ChromeOS ("CrOS") runs the launcher in its Linux terminal, which reports plain Linux.
+  if (/Linux|X11|CrOS/i.test(hint) || /Linux|CrOS/.test(ua)) return { key: "linux-x86_64", label: "Linux x86-64" };
   return null;
 }
 
+// Only Chromium's client hints say which processor a Linux computer has: x86_64 or arm ("arm" for arm64 too).
+async function armLinux() {
+  try {
+    return (await navigator.userAgentData.getHighEntropyValues(["architecture"])).architecture === "arm";
+  } catch {
+    return false;
+  }
+}
+
 async function setUpDownload() {
-  const os = platform();
+  let os = platform();
+  // ARM Linux: Chromebooks' Linux terminal and other arm64 machines.
+  if (os && os.key === "linux-x86_64" && (await armLinux())) os = { key: "linux-arm64", label: "Linux arm64 (Chromebooks)" };
   const list = await releases;
   const launcher = list.filter(isLauncher).sort((a, b) => newestFirst(a.tag_name, b.tag_name))[0];
   if (!launcher) return;
@@ -77,7 +89,7 @@ async function setUpDownload() {
   const mb = asset && asset.size ? ` · ${(asset.size / 1e6).toFixed(0)} MB` : "";
   const meta = asset
     ? `For ${escape(os.label)} · launcher ${escape(version)}${mb} · ${others}`
-    : `Launcher ${escape(version)} for Linux x86-64, macOS on Apple Silicon and Windows x64. It runs on a computer, not on phones or tablets.`;
+    : `Launcher ${escape(version)} for Linux x86-64 and arm64, macOS on Apple Silicon and Windows x64. It runs on a computer, not on phones or tablets.`;
   document.querySelectorAll("[data-download-meta]").forEach((p) => (p.innerHTML = meta));
 }
 
