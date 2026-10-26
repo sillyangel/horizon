@@ -44,12 +44,16 @@ pub struct Release {
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
 pub const ASSET: Option<&str> = Some("horizon-linux-x86_64.tar.gz");
+// ARM Linux: Chromebooks' Linux terminal, and other arm64 machines.
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+pub const ASSET: Option<&str> = Some("horizon-linux-arm64.tar.gz");
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 pub const ASSET: Option<&str> = Some("horizon-macos-arm64.zip");
 #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
 pub const ASSET: Option<&str> = Some("horizon-windows-x64.zip");
 #[cfg(not(any(
     all(target_os = "linux", target_arch = "x86_64"),
+    all(target_os = "linux", target_arch = "aarch64"),
     all(target_os = "macos", target_arch = "aarch64"),
     all(target_os = "windows", target_arch = "x86_64")
 )))]
@@ -57,12 +61,15 @@ pub const ASSET: Option<&str> = None;
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
 pub const LAUNCHER_ASSET: Option<&str> = Some("horizon-launcher-linux-x86_64.tar.gz");
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+pub const LAUNCHER_ASSET: Option<&str> = Some("horizon-launcher-linux-arm64.tar.gz");
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 pub const LAUNCHER_ASSET: Option<&str> = Some("horizon-launcher-macos-arm64.zip");
 #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
 pub const LAUNCHER_ASSET: Option<&str> = Some("horizon-launcher-windows-x64.zip");
 #[cfg(not(any(
     all(target_os = "linux", target_arch = "x86_64"),
+    all(target_os = "linux", target_arch = "aarch64"),
     all(target_os = "macos", target_arch = "aarch64"),
     all(target_os = "windows", target_arch = "x86_64")
 )))]
@@ -2744,9 +2751,11 @@ mod tests {
         assert!(is_launcher_tag("launcher@0.2.0"));
         assert_eq!(launcher_version("v2026.10.13"), None);
         assert_eq!(launcher_version("launcher-vx"), None);
+        let asset = ASSET.unwrap_or("horizon-linux-x86_64.tar.gz");
+        let launcher = LAUNCHER_ASSET.unwrap_or("unsupported");
         let list = serde_json::json!([
-            {"tag_name": "v2026.10.12", "assets": [{"name": "horizon-linux-x86_64.tar.gz", "browser_download_url": "u", "size": 1}]},
-            {"tag_name": "launcher-v9.0.0", "assets": [{"name": "horizon-launcher-linux-x86_64.tar.gz", "browser_download_url": "u", "size": 1}]},
+            {"tag_name": "v2026.10.12", "assets": [{"name": asset, "browser_download_url": "u", "size": 1}]},
+            {"tag_name": "launcher-v9.0.0", "assets": [{"name": launcher, "browser_download_url": "u", "size": 1}]},
             {"tag_name": "v2026.10.13", "assets": []},
             {"tag_name": "launcher-v0.0.1", "draft": true, "assets": []},
         ]);
