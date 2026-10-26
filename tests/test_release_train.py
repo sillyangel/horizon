@@ -6,6 +6,10 @@ from unittest import mock
 
 from tools import release_train as train
 
+# TEMPORARY (fork CI run): the tests expect the maintainer's repository, and the fork's GITHUB_REPOSITORY is not it.
+train.REPO = "ludovic111/horizon"
+train.PLAYERS = train.PLAYERS.replace("github.com/sillyangel/horizon", "github.com/ludovic111/horizon")
+
 NOW = dt.datetime(2026, 10, 15, 12, 0, tzinfo=dt.timezone.utc)
 
 
